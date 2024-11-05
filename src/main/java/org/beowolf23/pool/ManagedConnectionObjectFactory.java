@@ -6,9 +6,9 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V extends ManagedConnection> extends BaseKeyedPooledObjectFactory<T, V> {
 
-    private final ConnectionHandler connectionHandler;
+    private final ConnectionHandler<T, V> connectionHandler;
 
-    public ManagedConnectionObjectFactory(ConnectionHandler connectionHandler) {
+    public ManagedConnectionObjectFactory(ConnectionHandler<T, V> connectionHandler) {
         this.connectionHandler = connectionHandler;
     }
 
