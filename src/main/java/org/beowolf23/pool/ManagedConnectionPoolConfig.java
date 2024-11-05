@@ -4,9 +4,9 @@ import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 
 import java.time.Duration;
 
-public class GenericConnectionPoolConfig extends GenericKeyedObjectPoolConfig {
+public class ManagedConnectionPoolConfig extends GenericKeyedObjectPoolConfig {
 
-    public GenericConnectionPoolConfig(int maxActive, int maxIdle, long idleTime,  long maxWaitTime) {
+    public ManagedConnectionPoolConfig(int maxActive, int maxIdle, long idleTime, long maxWaitTime) {
         this.setMaxTotalPerKey(maxActive);
         this.setMaxIdlePerKey(maxIdle);
         this.setMaxWait(Duration.ofSeconds(maxWaitTime));

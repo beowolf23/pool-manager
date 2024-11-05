@@ -1,14 +1,20 @@
 package org.beowolf23.pool;
 
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
-import org.apache.commons.pool2.DestroyMode;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
-public class GenericConnectionFactory<T extends ConnectionConfiguration, V extends ManagedConnection> extends BaseKeyedPooledObjectFactory<T, V> {
+public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V extends ManagedConnection> extends BaseKeyedPooledObjectFactory<T, V> {
+
+    private final ConnectionHandler connectionHandler;
+
+    public ManagedConnectionObjectFactory(ConnectionHandler connectionHandler) {
+        this.connectionHandler = connectionHandler;
+    }
+
     @Override
     public V create(T key) {
-        
+        return connectionHandler.connect(key);
     }
 
     @Override
@@ -18,12 +24,11 @@ public class GenericConnectionFactory<T extends ConnectionConfiguration, V exten
 
     @Override
     public void destroyObject(T key, PooledObject<V> p) throws Exception {
-        p.getObject().disconnect();
-        super.destroyObject(key, p);
+        connectionHandler.disconnect(p.getObject());
     }
 
     @Override
     public boolean validateObject(T key, PooledObject<V> p) {
-        return p.getObject().isValid();
+        return connectionHandler.isValid(p.getObject());
     }
 }
