@@ -1,6 +1,5 @@
 package org.beowolf23;
 
-import net.schmizz.sshj.SSHClient;
 import org.beowolf23.pool.GenericResponse;
 import org.beowolf23.pool.ManagedConnectionObjectFactory;
 import org.beowolf23.pool.ManagedConnectionPool;
@@ -22,15 +21,22 @@ public class App
         ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool = new ManagedConnectionPool<>(factory);
 
         // Borrow a connection from the pool
-        SSHJConnection sshConnection = null;
+        SSHJConnection sshConnection;
+        SSHJConnection sshConnection2;
+        SSHJConnection sshConnection3;
+        GenericResponse<SSHJConnection> response;
         try {
             sshConnection = pool.borrowObject(sshConfiguration);
+            sshConnectionHandler.executeCommand(sshConnection, () -> "ls -l");
+            sshConnection2 = pool.borrowObject(sshConfiguration);
+            sshConnectionHandler.executeCommand(sshConnection2, () -> "ls -l");
+            sshConnection3 = pool.borrowObject(sshConfiguration);
+            response = sshConnectionHandler.executeCommand(sshConnection3, () -> "ls -l");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // Execute a remote command using the borrowed connection
-        GenericResponse<SSHJConnection> response = sshConnectionHandler.executeCommand(sshConnection, () -> "ls -l");
 
         // Check the result
         if (response.getCode() == 0) {
@@ -49,6 +55,14 @@ public class App
         System.out.println("Number of active connections: " + pool.getNumActive());
         System.out.println("Number of idle connections: " + pool.getNumIdle());
         pool.returnObject(sshConfiguration, sshConnection);
+        pool.returnObject(sshConfiguration, sshConnection2);
+        pool.returnObject(sshConfiguration, sshConnection3);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         System.out.println("=================================");
         System.out.println("Number of active connections: " + pool.getNumActive());

@@ -23,7 +23,7 @@ public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V
     }
 
     @Override
-    public void destroyObject(T key, PooledObject<V> p) throws Exception {
+    public void destroyObject(T key, PooledObject<V> p) {
         connectionHandler.disconnect(p.getObject());
     }
 
@@ -31,4 +31,5 @@ public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V
     public boolean validateObject(T key, PooledObject<V> p) {
         return connectionHandler.isValid(p.getObject());
     }
+
 }
