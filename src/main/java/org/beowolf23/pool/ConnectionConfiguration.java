@@ -1,21 +1,19 @@
 package org.beowolf23.pool;
 
+import java.util.Objects;
+
 public class ConnectionConfiguration {
 
-    private String hostname;
-    private String port;
-    private String username;
-    private String password;
+    private final String hostname;
+    private final String port;
+    private final String username;
+    private final String password;
 
     public ConnectionConfiguration(String hostname, String port, String username, String password) {
         this.hostname = hostname;
         this.port = port;
         this.username = username;
         this.password = password;
-    }
-
-    public ConnectionConfiguration() {
-
     }
 
     public String getHostname() {
@@ -34,19 +32,19 @@ public class ConnectionConfiguration {
         return password;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConnectionConfiguration that = (ConnectionConfiguration) o;
+        return Objects.equals(hostname, that.hostname) &&
+                Objects.equals(port, that.port) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password);
     }
 
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public int hashCode() {
+        return Objects.hash(hostname, port, username, password);
     }
 }
