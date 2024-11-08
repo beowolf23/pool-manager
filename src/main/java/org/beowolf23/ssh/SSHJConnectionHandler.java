@@ -1,8 +1,6 @@
 package org.beowolf23.ssh;
 
-import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.beowolf23.pool.ConnectionHandler;
 import org.beowolf23.pool.GenericResponse;
 
@@ -14,39 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SSHConnectionHandler implements ConnectionHandler<SSHConfiguration, SSHJConnection> {
-
-    private SSHClient createClient(SSHConfiguration sshConfiguration) {
-        SSHClient client;
-        try {
-            client = new SSHClient();
-            client.addHostKeyVerifier(new PromiscuousVerifier());
-            client.connect(sshConfiguration.getHostname());
-            client.authPassword(sshConfiguration.getUsername(), sshConfiguration.getPassword());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return client;
-    }
+public class SSHJConnectionHandler implements ConnectionHandler<SSHJConfiguration, SSHJConnection> {
 
     @Override
-    public SSHJConnection connect(SSHConfiguration sshConfiguration) {
-        SSHClient client = createClient(sshConfiguration);
-        return new SSHJConnection(client);
+    public SSHJConnection connect(SSHJConfiguration sshConfiguration) {
+        return SSHJConnection.createConnected(sshConfiguration);
     }
 
     @Override
     public void disconnect(SSHJConnection managedConnection) {
-        try {
-            managedConnection.getClient().disconnect();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        managedConnection.disconnect();
     }
 
     @Override
     public boolean isValid(SSHJConnection managedConnection) {
-        return managedConnection.getClient().isConnected();
+        return managedConnection.isValid();
     }
 
     @Override

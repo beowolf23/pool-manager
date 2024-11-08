@@ -12,7 +12,6 @@ public class ManagedConnectionPoolConfig extends GenericKeyedObjectPoolConfig {
         this.setMaxWait(Duration.ofSeconds(maxWaitTime));
         this.setMinEvictableIdleDuration(Duration.ofSeconds(idleTime));
         this.setBlockWhenExhausted(true);
-        this.setMaxIdlePerKey(2);
         this.setTestOnBorrow(true);
         this.setTestOnReturn(true);
         this.setTestWhileIdle(true);

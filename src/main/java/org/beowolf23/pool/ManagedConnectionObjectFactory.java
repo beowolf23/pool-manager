@@ -32,4 +32,7 @@ public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V
         return connectionHandler.isValid(p.getObject());
     }
 
+    public ConnectionHandler<T, V> getConnectionHandler() {
+        return connectionHandler;
+    }
 }
