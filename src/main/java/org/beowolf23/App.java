@@ -1,10 +1,8 @@
 package org.beowolf23;
 
-import org.beowolf23.pool.GenericResponse;
-import org.beowolf23.pool.ManagedConnectionObjectFactory;
-import org.beowolf23.pool.ManagedConnectionPool;
-import org.beowolf23.ssh.SSHConfiguration;
-import org.beowolf23.ssh.SSHConnectionHandler;
+import org.beowolf23.pool.*;
+import org.beowolf23.ssh.SSHJConfiguration;
+import org.beowolf23.ssh.SSHJConnectionHandler;
 import org.beowolf23.ssh.SSHJConnection;
 
 /**
@@ -15,10 +13,17 @@ public class App
 {
     public static void main( String[] args )
     {
-        SSHConfiguration sshConfiguration = new SSHConfiguration("localhost", "22", "user", "bibi");
-        SSHConnectionHandler sshConnectionHandler = new SSHConnectionHandler();
-        ManagedConnectionObjectFactory<SSHConfiguration, SSHJConnection> factory = new ManagedConnectionObjectFactory<>(sshConnectionHandler);
-        ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool = new ManagedConnectionPool<>(factory);
+        SSHJConfiguration sshConfiguration = new SSHJConfiguration("localhost", "22", "user", "bibi");
+
+        SSHJConnectionHandler handler = new SSHJConnectionHandler();
+
+        ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool = new ManagedConnectionPoolBuilder<SSHJConfiguration, SSHJConnection>()
+                .withHandler(handler)
+                .maxActive(10)
+                .maxIdle(2)
+                .maxWaitTime(20)
+                .idleTime(20)
+                .build();
 
         // Borrow a connection from the pool
         SSHJConnection sshConnection;
@@ -27,11 +32,11 @@ public class App
         GenericResponse<SSHJConnection> response;
         try {
             sshConnection = pool.borrowObject(sshConfiguration);
-            sshConnectionHandler.executeCommand(sshConnection, () -> "ls -l");
+            handler.executeCommand(sshConnection, () -> "ls -l");
             sshConnection2 = pool.borrowObject(sshConfiguration);
-            sshConnectionHandler.executeCommand(sshConnection2, () -> "ls -l");
+            handler.executeCommand(sshConnection2, () -> "ls -l");
             sshConnection3 = pool.borrowObject(sshConfiguration);
-            response = sshConnectionHandler.executeCommand(sshConnection3, () -> "ls -l");
+            response = handler.executeCommand(sshConnection3, () -> "ls -l");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

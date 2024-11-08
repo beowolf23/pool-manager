@@ -1,4 +1,4 @@
-package org.beowolf23;
+package org.beowolf23.integration;
 
 import org.beowolf23.pool.ConnectionConfiguration;
 import org.beowolf23.pool.ManagedConnection;

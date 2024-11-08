@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SSHConnectionHandler implements ConnectionHandler<SSHConfiguration, SSHJConnection> {
+public class SSHJConnectionHandler implements ConnectionHandler<SSHJConfiguration, SSHJConnection> {
 
-    private SSHClient createClient(SSHConfiguration sshConfiguration) {
+    private SSHClient createClient(SSHJConfiguration sshConfiguration) {
         SSHClient client;
         try {
             client = new SSHClient();
@@ -30,7 +30,7 @@ public class SSHConnectionHandler implements ConnectionHandler<SSHConfiguration,
     }
 
     @Override
-    public SSHJConnection connect(SSHConfiguration sshConfiguration) {
+    public SSHJConnection connect(SSHJConfiguration sshConfiguration) {
         SSHClient client = createClient(sshConfiguration);
         return new SSHJConnection(client);
     }
