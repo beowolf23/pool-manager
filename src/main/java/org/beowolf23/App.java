@@ -1,10 +1,8 @@
 package org.beowolf23;
 
-import org.beowolf23.pool.GenericResponse;
-import org.beowolf23.pool.ManagedConnectionObjectFactory;
-import org.beowolf23.pool.ManagedConnectionPool;
-import org.beowolf23.ssh.SSHConfiguration;
-import org.beowolf23.ssh.SSHConnectionHandler;
+import org.beowolf23.pool.*;
+import org.beowolf23.ssh.SSHJConfiguration;
+import org.beowolf23.ssh.SSHJConnectionHandler;
 import org.beowolf23.ssh.SSHJConnection;
 
 /**
@@ -15,23 +13,21 @@ public class App
 {
     public static void main( String[] args )
     {
-        SSHConfiguration sshConfiguration = new SSHConfiguration("localhost", "22", "user", "bibi");
-        SSHConnectionHandler sshConnectionHandler = new SSHConnectionHandler();
-        ManagedConnectionObjectFactory<SSHConfiguration, SSHJConnection> factory = new ManagedConnectionObjectFactory<>(sshConnectionHandler);
-        ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool = new ManagedConnectionPool<>(factory);
+        SSHJConfiguration sshConfiguration = new SSHJConfiguration("localhost", "22", "user", "bibi");
 
-        // Borrow a connection from the pool
-        SSHJConnection sshConnection;
-        SSHJConnection sshConnection2;
-        SSHJConnection sshConnection3;
+        ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool = new ManagedConnectionPoolBuilder<SSHJConfiguration, SSHJConnection>()
+                .withHandler(new SSHJConnectionHandler())
+                .maxActive(10)
+                .maxIdle(0)
+                .maxWaitTime(20)
+                .idleTime(0)
+                .build();
+
         GenericResponse<SSHJConnection> response;
         try {
-            sshConnection = pool.borrowObject(sshConfiguration);
-            sshConnectionHandler.executeCommand(sshConnection, () -> "ls -l");
-            sshConnection2 = pool.borrowObject(sshConfiguration);
-            sshConnectionHandler.executeCommand(sshConnection2, () -> "ls -l");
-            sshConnection3 = pool.borrowObject(sshConfiguration);
-            response = sshConnectionHandler.executeCommand(sshConnection3, () -> "ls -l");
+            response = pool.executeCommand(sshConfiguration, () -> "ls -l");
+            Thread.sleep(1000);
+            System.out.println(pool.getNumIdle());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,23 +46,6 @@ public class App
                 response.getException().printStackTrace();
             }
         }
-
-        // Return the connection to the pool
-        System.out.println("Number of active connections: " + pool.getNumActive());
-        System.out.println("Number of idle connections: " + pool.getNumIdle());
-        pool.returnObject(sshConfiguration, sshConnection);
-        pool.returnObject(sshConfiguration, sshConnection2);
-        pool.returnObject(sshConfiguration, sshConnection3);
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println("=================================");
-        System.out.println("Number of active connections: " + pool.getNumActive());
-        System.out.println("Number of idle connections: " + pool.getNumIdle());
 
         // Shutdown the pool
         pool.close();
