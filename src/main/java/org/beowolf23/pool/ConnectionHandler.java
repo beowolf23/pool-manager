@@ -8,6 +8,4 @@ public interface ConnectionHandler<T extends ConnectionConfiguration, V extends 
      V connect(T t);
      void disconnect(V v);
      boolean isValid(V v);
-     GenericResponse<V> executeCommand(V v, Supplier supplier);
-
 }
