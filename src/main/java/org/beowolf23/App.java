@@ -6,6 +6,9 @@ import org.beowolf23.ssh.SSHJConfiguration;
 import org.beowolf23.ssh.SSHJConnectionHandler;
 import org.beowolf23.ssh.SSHJConnection;
 
+import java.io.ByteArrayInputStream;
+import java.io.OutputStream;
+
 /**
  * Hello world!
  *
@@ -47,6 +50,19 @@ public class App
             if (response.getException() != null) {
                 response.getException().printStackTrace();
             }
+        }
+
+        try {
+            commandExecutor.uploadFile(sshConfiguration, new ByteArrayInputStream("something in here".getBytes()), "/home/user/file.txt");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        OutputStream os;
+        try {
+            os = commandExecutor.downloadFile(sshConfiguration, "/home/user/file.txt");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         // Shutdown the pool

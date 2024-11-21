@@ -2,22 +2,23 @@ package org.beowolf23.ssh;
 
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.sftp.OpenMode;
+import net.schmizz.sshj.sftp.RemoteFile;
 import net.schmizz.sshj.transport.TransportException;
+import org.apache.commons.io.IOUtils;
 import org.beowolf23.command.AbstractCommandExecutor;
 import org.beowolf23.command.FileDownloader;
 import org.beowolf23.command.FileUploader;
 import org.beowolf23.pool.GenericResponse;
 import org.beowolf23.pool.ManagedConnectionPool;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfiguration, SSHJConnection> implements FileDownloader, FileUploader {
+public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfiguration, SSHJConnection>
+        implements FileDownloader<SSHJConfiguration>, FileUploader<SSHJConfiguration> {
 
     public SSHJCommandExecutor(ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool) {
         super(pool);
@@ -56,5 +57,57 @@ public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfigurati
             throw new RuntimeException("Failed to read command output: " + e.getMessage(), e);
         }
         return output;
+    }
+
+    @Override
+    public OutputStream downloadFile(SSHJConfiguration sshjConfiguration, String remoteFilePath) throws Exception {
+
+        SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        RemoteFile file = connection.getClient().newSFTPClient().getSFTPEngine().open(remoteFilePath, EnumSet.of(OpenMode.READ));
+
+        InputStream is = file.new RemoteFileInputStream() {
+
+            @Override
+            public void close() throws IOException {
+                try {
+                    super.close();
+                } finally {
+                    file.close();
+                }
+            }
+        };
+
+        is.transferTo(os);
+
+        return os;
+    }
+
+    @Override
+    public void uploadFile(SSHJConfiguration sshjConfiguration, InputStream inputStream, String remoteFilePath) throws Exception {
+        SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
+
+        RemoteFile file = connection
+                .getClient()
+                .newSFTPClient()
+                .getSFTPEngine()
+                .open(remoteFilePath, EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
+
+        OutputStream os = file.new RemoteFileOutputStream(0, 10) {
+
+            @Override
+            public void close() throws IOException {
+                try {
+                    super.close();
+                } finally {
+                    file.close();
+                }
+            }
+        };
+
+        IOUtils.copy(inputStream, os);
+
+        getPool().returnObject(sshjConfiguration, connection);
     }
 }

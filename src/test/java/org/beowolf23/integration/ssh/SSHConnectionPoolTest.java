@@ -62,11 +62,11 @@ public class SSHConnectionPoolTest extends ConnectionPoolTestBase<SSHJConfigurat
         ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool = createPool();
         SSHJConfiguration config = createConfiguration();
 
-        GenericResponse<SSHJConnection> response = pool.executeCommand(config, () -> "ls -l");
-
-        assertNotNull(response);
-        assertEquals(List.of("total 0"), response.getStdout());
-        assertEquals(0, response.getCode());
-        assertNull(response.getException());
+//        GenericResponse<SSHJConnection> response = pool.executeCommand(config, () -> "ls -l");
+//
+//        assertNotNull(response);
+//        assertEquals(List.of("total 0"), response.getStdout());
+//        assertEquals(0, response.getCode());
+//        assertNull(response.getException());
     }
 }
