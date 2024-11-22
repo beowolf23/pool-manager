@@ -78,7 +78,7 @@ public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfigurati
         return os;
     }
 
-    public void uploadFile(SSHJConfiguration sshjConfiguration, InputStream inputStream, String remoteFilePath) throws Exception {
+    public void uploadFile(SSHJConfiguration sshjConfiguration, InputStream is, String remoteFilePath) throws Exception {
         SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
 
         try (SSHClient client = connection.getClient();
@@ -86,7 +86,7 @@ public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfigurati
              RemoteFile file = engine.open(remoteFilePath, EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
              OutputStream os = file.new RemoteFileOutputStream(0, 10)) {
 
-            IOUtils.copy(inputStream, os);
+            is.transferTo(os);
             getPool().returnObject(sshjConfiguration, connection);
         }
     }
