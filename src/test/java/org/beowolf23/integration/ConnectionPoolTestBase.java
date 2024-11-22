@@ -13,15 +13,18 @@ public abstract class ConnectionPoolTestBase<T extends ConnectionConfiguration, 
     protected abstract T createConfiguration();
 
     @Test
-    public void testBorrowAndReturn() throws Exception {
+    public void when_borrowingAndReturningConnection_then_poolStateIsUpdatedCorrectly() throws Exception {
         ManagedConnectionPool<T, V> pool = createPool();
         T config = createConfiguration();
 
         V connection = pool.borrowObject(config);
+
         assertNotNull(connection);
-        assertEquals(1, pool.getNumActive());
+        assertEquals(1, pool.getNumActive(), "Number of active connections should be 1 after borrowing");
 
         pool.returnObject(config, connection);
-        assertEquals(1, pool.getNumIdle());
+
+        assertEquals(1, pool.getNumIdle(), "Number of idle connections should be 1 after returning");
+        assertEquals(0, pool.getNumActive(), "Number of active connections should be 0 after returning");
     }
 }

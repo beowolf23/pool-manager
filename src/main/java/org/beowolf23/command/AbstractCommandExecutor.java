@@ -11,17 +11,19 @@ public abstract class AbstractCommandExecutor<T extends ConnectionConfiguration,
 
     private final ManagedConnectionPool<T, V> pool;
 
-    public AbstractCommandExecutor(ManagedConnectionPool<T, V> pool) {
+    protected AbstractCommandExecutor(ManagedConnectionPool<T, V> pool) {
         this.pool = pool;
     }
 
     @Override
-    public GenericResponse<V> executeCommand(T t, Function<V, GenericResponse<V>> function) throws Exception {
+    public GenericResponse<V> executeCommand(T t, String command) throws Exception {
         V v = pool.borrowObject(t);
-        GenericResponse<V> response = function.apply(v);
+        GenericResponse<V> response = commandToBeExecuted(command).apply(v);
         pool.returnObject(t, v);
         return response;
     }
+
+    public abstract Function<V, GenericResponse<V>> commandToBeExecuted(String command);
 
     public ManagedConnectionPool<T, V> getPool() {
         return pool;
