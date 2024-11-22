@@ -1,9 +1,11 @@
 package org.beowolf23.ssh;
 
+import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.OpenMode;
 import net.schmizz.sshj.sftp.RemoteFile;
+import net.schmizz.sshj.sftp.SFTPEngine;
 import net.schmizz.sshj.transport.TransportException;
 import org.apache.commons.io.IOUtils;
 import org.beowolf23.command.AbstractCommandExecutor;
@@ -62,52 +64,30 @@ public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfigurati
     @Override
     public OutputStream downloadFile(SSHJConfiguration sshjConfiguration, String remoteFilePath) throws Exception {
 
-        SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
+        ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool = getPool();
+        SSHJConnection connection = pool.borrowObject(sshjConfiguration);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        RemoteFile file = connection.getClient().newSFTPClient().getSFTPEngine().open(remoteFilePath, EnumSet.of(OpenMode.READ));
-
-        InputStream is = file.new RemoteFileInputStream() {
-
-            @Override
-            public void close() throws IOException {
-                try {
-                    super.close();
-                } finally {
-                    file.close();
-                }
-            }
-        };
-
-        is.transferTo(os);
-
+        try (SSHClient client = connection.getClient();
+             SFTPEngine engine = client.newSFTPClient().getSFTPEngine();
+             RemoteFile file = engine.open(remoteFilePath, EnumSet.of(OpenMode.READ));
+             InputStream is = file.new RemoteFileInputStream()) {
+            is.transferTo(os);
+        }
+        pool.returnObject(sshjConfiguration, connection);
         return os;
     }
 
-    @Override
     public void uploadFile(SSHJConfiguration sshjConfiguration, InputStream inputStream, String remoteFilePath) throws Exception {
         SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
 
-        RemoteFile file = connection
-                .getClient()
-                .newSFTPClient()
-                .getSFTPEngine()
-                .open(remoteFilePath, EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
+        try (SSHClient client = connection.getClient();
+             SFTPEngine engine = client.newSFTPClient().getSFTPEngine();
+             RemoteFile file = engine.open(remoteFilePath, EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
+             OutputStream os = file.new RemoteFileOutputStream(0, 10)) {
 
-        OutputStream os = file.new RemoteFileOutputStream(0, 10) {
-
-            @Override
-            public void close() throws IOException {
-                try {
-                    super.close();
-                } finally {
-                    file.close();
-                }
-            }
-        };
-
-        IOUtils.copy(inputStream, os);
-
-        getPool().returnObject(sshjConfiguration, connection);
+            IOUtils.copy(inputStream, os);
+            getPool().returnObject(sshjConfiguration, connection);
+        }
     }
 }
