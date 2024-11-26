@@ -32,7 +32,6 @@ class ManagedPoolConnectionTest {
 
     @Test
     void when_borrowingAConnectionFromThePool_then_returns_NoError() throws Exception {
-
         // Configure mocks
         when(connectionHandler.connect(mockConfig)).thenReturn(mockConnection);
         when(connectionHandler.isValid(mockConnection)).thenReturn(true);
