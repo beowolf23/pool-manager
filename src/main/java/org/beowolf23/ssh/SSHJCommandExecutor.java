@@ -75,7 +75,7 @@ public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfigurati
 //        SSHJConnection connection = getPool().borrowObject(sshjConfiguration);
 //
 //        try (SSHClient client = connection.getClient();
-//             SFTPEngine engine = client.newSFTPClient().getSFTPEngine();
+//             SFTPEngine engine = client.newSFkTPClient().getSFTPEngine();
 //             RemoteFile file = engine.open(remoteFilePath, EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
 //             OutputStream os = file.new RemoteFileOutputStream(0, 10)) {
 //

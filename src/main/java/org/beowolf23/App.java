@@ -1,10 +1,9 @@
 package org.beowolf23;
 
 import org.beowolf23.pool.*;
-import org.beowolf23.ssh.SSHJCommandExecutor;
-import org.beowolf23.ssh.SSHJConfiguration;
-import org.beowolf23.ssh.SSHJConnectionHandler;
-import org.beowolf23.ssh.SSHJConnection;
+import org.beowolf23.ssh.*;
+
+import java.io.ByteArrayInputStream;
 
 public class App
 {
@@ -20,12 +19,26 @@ public class App
                 .idleTime(0)
                 .build();
         SSHJCommandExecutor commandExecutor = new SSHJCommandExecutor(pool);
+        SSHJFileUploader fileUploader = new SSHJFileUploader(pool);
+        SSHJFileDownloader fileDownloader = new SSHJFileDownloader(pool);
 
         GenericResponse<SSHJConnection> response;
         try {
             response = commandExecutor.executeCommand(sshConfiguration, "ls");
             Thread.sleep(1000);
             System.out.println(response.getStdout());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            fileUploader.uploadFile(sshConfiguration, new ByteArrayInputStream("something in here".getBytes()), "/tmp/flag.txt");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            System.out.println(fileDownloader.downloadFile(sshConfiguration, "/tmp/flag.txt").toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
