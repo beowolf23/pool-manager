@@ -1,0 +1,15 @@
+There are only two convenient reasons to catch an exception inside a library:
+
+1. Handling the exception: If the library can resolve the issue, such as implementing a fail-safe or retry mechanism, or providing a default configuration file when the user passes an invalid one.
+2. Logging: Capturing details about the exception for debugging or auditing purposes.
+
+For the first case, if the library cannot fully resolve the issue in the catch block, it must throw a new exception.
+For the second case, after logging the details, the library should rethrow a new exception.
+
+In both scenarios, exception chaining is critical. This ensures that the user of the library can trace and debug the root cause without losing the original stack trace of the exception.
+
+Additionally, it’s recommended that the library defines its own exception types. For example, throwing a SpecialCaseException related to the library’s functionality is much clearer and more helpful than throwing a generic IOException.
+
+In all other cases where the library cannot handle the exception or there is no valid reason to log anything, it’s better to let the exception propagate to the upper levels instead of catching it unnecessarily.
+
+A good reference to have more insight into this topic is: Bloch's Effective Java section 10 - Exceptions
