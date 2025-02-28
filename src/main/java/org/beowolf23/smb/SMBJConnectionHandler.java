@@ -1,8 +1,8 @@
 package org.beowolf23.smb;
 
-import org.beowolf23.pool.ConnectionHandler;
+import org.beowolf23.pool.Handler;
 
-public class SMBJConnectionHandler implements ConnectionHandler<SMBJConfiguration, SMBJConnection> {
+public class SMBJConnectionHandler implements Handler<SMBJConfiguration, SMBJConnection> {
 
     @Override
     public SMBJConnection connect(SMBJConfiguration smbjConfiguration) {

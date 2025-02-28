@@ -1,9 +1,10 @@
 package org.beowolf23.integration.ssh;
 
 import org.beowolf23.pool.GenericResponse;
-import org.beowolf23.pool.ManagedConnectionPoolBuilder;
-import org.beowolf23.ssh.*;
 import org.beowolf23.pool.ManagedConnectionPool;
+import org.beowolf23.pool.ManagedConnectionPoolBuilder;
+import org.beowolf23.ssh.SSHConfiguration;
+import org.beowolf23.ssh.sshj.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,8 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class SSHConnectionPoolTest {
 
@@ -25,8 +27,8 @@ public class SSHConnectionPoolTest {
 
     private static final String CONTAINER_IMAGE = "rastasheep/ubuntu-sshd:latest";
 
-    private static ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool;
-    private static SSHJConfiguration sshjConfiguration;
+    private static ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool;
+    private static SSHConfiguration sshjConfiguration;
     private static SSHJCommandExecutor sshjCommandExecutor;
     private static SSHJFileUploader sshjFileUploader;
     private static SSHJFileDownloader sshjFileDownloader;
@@ -52,8 +54,8 @@ public class SSHConnectionPoolTest {
         }
     }
 
-    protected static ManagedConnectionPool<SSHJConfiguration, SSHJConnection> createPool() {
-        return new ManagedConnectionPoolBuilder<SSHJConfiguration, SSHJConnection>()
+    protected static ManagedConnectionPool<SSHConfiguration, SSHJConnection> createPool() {
+        return new ManagedConnectionPoolBuilder<SSHConfiguration, SSHJConnection>()
                 .withHandler(new SSHJConnectionHandler())
                 .maxActive(10)
                 .maxIdle(2)
@@ -62,9 +64,9 @@ public class SSHConnectionPoolTest {
                 .build();
     }
 
-    protected static SSHJConfiguration createConfiguration() {
+    protected static SSHConfiguration createConfiguration() {
         Integer containerSshPort = sshContainer.getMappedPort(SSH_PORT);
-        return new SSHJConfiguration(sshContainer.getHost(), containerSshPort.toString(),
+        return new SSHConfiguration(sshContainer.getHost(), containerSshPort.toString(),
                 CONTAINER_USERNAME, CONTAINER_PASSWORD);
     }
 

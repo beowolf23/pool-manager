@@ -2,14 +2,14 @@ package org.beowolf23.pool;
 
 import java.util.Objects;
 
-public class ConnectionConfiguration {
+public class Configuration {
 
     private final String hostname;
     private final String port;
     private final String username;
     private final String password;
 
-    public ConnectionConfiguration(String hostname, String port, String username, String password) {
+    public Configuration(String hostname, String port, String username, String password) {
         this.hostname = hostname;
         this.port = port;
         this.username = username;
@@ -36,7 +36,7 @@ public class ConnectionConfiguration {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ConnectionConfiguration that = (ConnectionConfiguration) o;
+        Configuration that = (Configuration) o;
         return Objects.equals(hostname, that.hostname) &&
                 Objects.equals(port, that.port) &&
                 Objects.equals(username, that.username) &&

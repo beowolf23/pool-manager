@@ -1,9 +1,10 @@
-package org.beowolf23.ssh;
+package org.beowolf23.ssh.sshj;
 
 import net.schmizz.sshj.sftp.OpenMode;
 import net.schmizz.sshj.sftp.SFTPClient;
 import org.beowolf23.command.FileUploader;
 import org.beowolf23.pool.ManagedConnectionPool;
+import org.beowolf23.ssh.SSHConfiguration;
 import org.beowolf23.ssh.exception.SSHFileTransferException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +15,10 @@ import java.io.OutputStream;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-public class SSHJFileUploader extends FileUploader<SSHJConfiguration, SSHJConnection> {
+public class SSHJFileUploader extends FileUploader<SSHConfiguration, SSHJConnection> {
     private static final Logger logger = LoggerFactory.getLogger(SSHJFileUploader.class);
 
-    public SSHJFileUploader(ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool) {
+    public SSHJFileUploader(ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool) {
         super(pool);
     }
 

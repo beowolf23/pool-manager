@@ -1,13 +1,13 @@
 package org.beowolf23.command;
 
-import org.beowolf23.pool.ConnectionConfiguration;
+import org.beowolf23.pool.Configuration;
+import org.beowolf23.pool.Connection;
 import org.beowolf23.pool.GenericResponse;
-import org.beowolf23.pool.ManagedConnection;
 import org.beowolf23.pool.ManagedConnectionPool;
 
 import java.util.function.Function;
 
-public abstract class AbstractCommandExecutor<T extends ConnectionConfiguration, V extends ManagedConnection> implements CommandExecutor<T, V> {
+public abstract class AbstractCommandExecutor<T extends Configuration, V extends Connection> implements CommandExecutor<T, V> {
 
     private final ManagedConnectionPool<T, V> pool;
 

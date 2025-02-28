@@ -1,13 +1,13 @@
 package org.beowolf23.command;
 
-import org.beowolf23.pool.ConnectionConfiguration;
-import org.beowolf23.pool.ManagedConnection;
+import org.beowolf23.pool.Connection;
+import org.beowolf23.pool.Configuration;
 import org.beowolf23.pool.ManagedConnectionPool;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-public abstract class FileUploader<T extends ConnectionConfiguration, V extends ManagedConnection> {
+public abstract class FileUploader<T extends Configuration, V extends Connection> {
 
     ManagedConnectionPool<T, V> pool;
 

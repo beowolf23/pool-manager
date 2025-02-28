@@ -6,28 +6,28 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatObject;
 import static org.mockito.Mockito.*;
 
 class ManagedPoolConnectionTest {
 
     @Mock
-    private ConnectionHandler<ConnectionConfiguration, ManagedConnection> connectionHandler;
+    private Handler<Configuration, Connection> connectionHandler;
 
     @Mock
-    private ConnectionConfiguration mockConfig;
+    private Configuration mockConfig;
 
     @Mock
-    private ManagedConnection mockConnection;
+    private Connection mockConnection;
 
-    private ManagedConnectionPool<ConnectionConfiguration, ManagedConnection> pool;
+    private ManagedConnectionPool<Configuration, Connection> pool;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ManagedConnectionObjectFactory<ConnectionConfiguration, ManagedConnection> factory =
+        ManagedConnectionObjectFactory<Configuration, Connection> factory =
                 new ManagedConnectionObjectFactory<>(connectionHandler);
-        pool = new ManagedConnectionPool<>(factory);
     }
 
     @Test
@@ -37,7 +37,7 @@ class ManagedPoolConnectionTest {
         when(connectionHandler.isValid(mockConnection)).thenReturn(true);
 
         // Borrow object from pool
-        ManagedConnection connection = pool.borrowObject(mockConfig);
+        Connection connection = pool.borrowObject(mockConfig);
 
         // Verify interactions
         assertThatObject(connection).isNotNull();
@@ -53,7 +53,7 @@ class ManagedPoolConnectionTest {
         when(connectionHandler.isValid(mockConnection)).thenReturn(true);
 
         // Borrow and return object
-        ManagedConnection connection = pool.borrowObject(mockConfig);
+        Connection connection = pool.borrowObject(mockConfig);
         pool.returnObject(mockConfig, connection);
 
         assertThat(pool.getNumIdle()).isEqualTo(1);
@@ -70,7 +70,7 @@ class ManagedPoolConnectionTest {
         when(connectionHandler.isValid(mockConnection)).thenReturn(true);
 
         // Borrow and invalidate the object
-        ManagedConnection connection = pool.borrowObject(mockConfig);
+        Connection connection = pool.borrowObject(mockConfig);
         pool.invalidateObject(mockConfig, connection);
 
         // Verify disconnect is called
