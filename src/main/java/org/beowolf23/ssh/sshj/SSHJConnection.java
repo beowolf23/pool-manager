@@ -1,8 +1,9 @@
-package org.beowolf23.ssh;
+package org.beowolf23.ssh.sshj;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import org.beowolf23.pool.ManagedConnection;
+import org.beowolf23.pool.Connection;
+import org.beowolf23.ssh.SSHConfiguration;
 import org.beowolf23.ssh.exception.SSHAuthenticationException;
 import org.beowolf23.ssh.exception.SSHConnectionException;
 import org.slf4j.Logger;
@@ -11,7 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 
-public class SSHJConnection extends ManagedConnection {
+public class SSHJConnection extends Connection {
+
     private static final Logger logger = LoggerFactory.getLogger(SSHJConnection.class);
     private final SSHClient client;
 
@@ -42,7 +44,7 @@ public class SSHJConnection extends ManagedConnection {
         return isValid;
     }
 
-    public static SSHJConnection createConnected(SSHJConfiguration config) {
+    public static SSHJConnection createConnected(SSHConfiguration config) {
         logger.debug("Creating new SSH connection to {}:{}", config.getHostname(), config.getPort());
         SSHClient client = new SSHClient();
         client.addHostKeyVerifier(new PromiscuousVerifier());
@@ -62,7 +64,7 @@ public class SSHJConnection extends ManagedConnection {
         }
     }
 
-    private static void authenticateClient(SSHClient client, SSHJConfiguration config) {
+    private static void authenticateClient(SSHClient client, SSHConfiguration config) {
         try {
             client.authPassword(config.getUsername(), config.getPassword());
             logger.info("Successfully authenticated user {} on {}:{}",

@@ -3,26 +3,25 @@ package org.beowolf23.pool;
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-
 import org.beowolf23.exception.ConnectionCreationException;
 import org.beowolf23.exception.ConnectionPoolException;
 import org.beowolf23.exception.ConnectionValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V extends ManagedConnection> extends BaseKeyedPooledObjectFactory<T, V> {
+public class ManagedConnectionObjectFactory<T extends Configuration, V extends Connection> extends BaseKeyedPooledObjectFactory<T, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(ManagedConnectionObjectFactory.class);
 
-    private final ConnectionHandler<T, V> connectionHandler;
+    private final Handler<T, V> connectionHandler;
 
-    public ManagedConnectionObjectFactory(ConnectionHandler<T, V> connectionHandler) {
+    public ManagedConnectionObjectFactory(Handler<T, V> connectionHandler) {
         this.connectionHandler = connectionHandler;
         logger.debug("Initializing connection factory with handler: {}", connectionHandler.getClass().getSimpleName());
     }
 
     @Override
-    public V create(T key) throws Exception {
+    public V create(T key) {
         try {
             logger.debug("Creating new connection for key: {}", key.getHostname());
             V connection = connectionHandler.connect(key);
@@ -41,7 +40,7 @@ public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V
     }
 
     @Override
-    public void destroyObject(T key, PooledObject<V> p) throws Exception {
+    public void destroyObject(T key, PooledObject<V> p) {
         try {
             logger.debug("Destroying connection for host: {}", key.getHostname());
             connectionHandler.disconnect(p.getObject());
@@ -67,7 +66,4 @@ public class ManagedConnectionObjectFactory<T extends ConnectionConfiguration, V
         }
     }
 
-    public ConnectionHandler<T, V> getConnectionHandler() {
-        return connectionHandler;
-    }
 }

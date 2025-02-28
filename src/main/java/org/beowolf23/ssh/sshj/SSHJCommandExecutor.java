@@ -1,22 +1,25 @@
-package org.beowolf23.ssh;
+package org.beowolf23.ssh.sshj;
 
 import net.schmizz.sshj.connection.channel.direct.Session;
 import org.beowolf23.command.AbstractCommandExecutor;
 import org.beowolf23.pool.GenericResponse;
 import org.beowolf23.pool.ManagedConnectionPool;
+import org.beowolf23.ssh.SSHConfiguration;
 import org.beowolf23.ssh.exception.SSHCommandExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHJConfiguration, SSHJConnection> {
+public class SSHJCommandExecutor extends AbstractCommandExecutor<SSHConfiguration, SSHJConnection> {
     private static final Logger logger = LoggerFactory.getLogger(SSHJCommandExecutor.class);
 
-    public SSHJCommandExecutor(ManagedConnectionPool<SSHJConfiguration, SSHJConnection> pool) {
+    public SSHJCommandExecutor(ManagedConnectionPool<SSHConfiguration, SSHJConnection> pool) {
         super(pool);
     }
 

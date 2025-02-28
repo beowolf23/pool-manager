@@ -1,7 +1,7 @@
 package org.beowolf23.smb;
 
-import org.beowolf23.pool.ManagedConnection;
+import org.beowolf23.pool.Connection;
 
-public class SMBJConnection extends ManagedConnection {
+public class SMBJConnection extends Connection {
 
 }

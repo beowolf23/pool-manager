@@ -8,21 +8,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.NoSuchElementException;
 
-public class ManagedConnectionPool<T extends ConnectionConfiguration, V extends ManagedConnection> extends GenericKeyedObjectPool<T, V> {
+public class ManagedConnectionPool<T extends Configuration, V extends Connection> extends GenericKeyedObjectPool<T, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(ManagedConnectionPool.class);
 
-    public ManagedConnectionPool(ManagedConnectionObjectFactory<T, V> factory) {
-        this(factory, 20, 20, 40, 40);
+    private ManagedConnectionPoolConfig config;
+
+    public ManagedConnectionPool(ManagedConnectionObjectFactory<T, V> factory, ManagedConnectionPoolConfig config) {
+        super(factory, config);
     }
 
-    public ManagedConnectionPool(ManagedConnectionObjectFactory<T, V> factory, int maxActive, int maxIdle, long idleTime, long maxWaitTime) {
-        super(factory, new ManagedConnectionPoolConfig(maxActive, maxIdle, idleTime, maxWaitTime));
-        logger.info("Initializing connection pool with maxActive={}, maxIdle={}, idleTime={}s, maxWaitTime={}s",
-                maxActive, maxIdle, idleTime, maxWaitTime);
-    }
     @Override
-    public V borrowObject(T key) throws Exception {
+    public V borrowObject(T key) {
         logger.debug("Attempting to borrow connection for key: {}", key.getHostname());
         try {
             V connection = super.borrowObject(key);
@@ -50,7 +47,7 @@ public class ManagedConnectionPool<T extends ConnectionConfiguration, V extends 
     }
 
     @Override
-    public void invalidateObject(T key, V obj) throws Exception {
+    public void invalidateObject(T key, V obj) {
         try {
             logger.info("Invalidating connection for key: {}", key.getHostname());
             super.invalidateObject(key, obj);

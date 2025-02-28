@@ -1,11 +1,12 @@
-package org.beowolf23.ssh;
+package org.beowolf23.ssh.sshj;
 
-import org.beowolf23.pool.ConnectionHandler;
+import org.beowolf23.pool.Handler;
+import org.beowolf23.ssh.SSHConfiguration;
 
-public class SSHJConnectionHandler implements ConnectionHandler<SSHJConfiguration, SSHJConnection> {
+public class SSHJConnectionHandler implements Handler<SSHConfiguration, SSHJConnection> {
 
     @Override
-    public SSHJConnection connect(SSHJConfiguration sshConfiguration) {
+    public SSHJConnection connect(SSHConfiguration sshConfiguration) {
         return SSHJConnection.createConnected(sshConfiguration);
     }
 

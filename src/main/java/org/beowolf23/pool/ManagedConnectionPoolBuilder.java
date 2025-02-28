@@ -1,8 +1,8 @@
 package org.beowolf23.pool;
 
-public class ManagedConnectionPoolBuilder<T extends ConnectionConfiguration, V extends ManagedConnection> {
+public class ManagedConnectionPoolBuilder<T extends Configuration, V extends Connection> {
 
-    private ConnectionHandler<T, V> connectionHandler;
+    private Handler<T, V> connectionHandler;
     private ManagedConnectionObjectFactory<T, V> factory;
     private int maxActive = 20;  // default
     private int maxIdle = 5;     // default
@@ -10,14 +10,8 @@ public class ManagedConnectionPoolBuilder<T extends ConnectionConfiguration, V e
     private long maxWaitTime = 10; // default in seconds
 
     // Set the ConnectionHandler
-    public ManagedConnectionPoolBuilder<T, V> withHandler(ConnectionHandler<T, V> handler) {
+    public ManagedConnectionPoolBuilder<T, V> withHandler(Handler<T, V> handler) {
         this.connectionHandler = handler;
-        return this;
-    }
-
-    // Set the Object Factory explicitly
-    public ManagedConnectionPoolBuilder<T, V> withFactory(ManagedConnectionObjectFactory<T, V> factory) {
-        this.factory = factory;
         return this;
     }
 
@@ -54,6 +48,6 @@ public class ManagedConnectionPoolBuilder<T extends ConnectionConfiguration, V e
             factory = new ManagedConnectionObjectFactory<>(connectionHandler);
         }
 
-        return new ManagedConnectionPool<>(factory, maxActive, maxIdle, idleTime, maxWaitTime);
+        return new ManagedConnectionPool<>(factory, new ManagedConnectionPoolConfig(maxActive, maxIdle, idleTime, maxWaitTime));
     }
 }
